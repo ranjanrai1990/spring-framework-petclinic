@@ -20,6 +20,25 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+- task: CopyFiles@2
+  displayName: Copy Files
+  inputs:
+    SourceFolder: $(system.defaultworkingdirectory)
+    Contents: '**'
+    TargetFolder: $(build.artifactstagingdirectory)
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    PathtoPublish: $(build.artifactstagingdirectory)
+
+- task: AzureWebApp@1
+  displayName: Azure Web App Deploy
+  inputs:
+    azureSubscription: $(serviceConnectionToAzure)
+    appType: webAppLinux
+    appName: $(appName)
+    package: $(build.artifactstagingdirectory)/**/*.war
 # at the top of your YAML file 
 # set some variables that you'll need when you deploy
 variables:
@@ -29,4 +48,4 @@ variables:
   # when you created the web app using the Azure CLI
   appName: my-app-name
 
-# ...
+
